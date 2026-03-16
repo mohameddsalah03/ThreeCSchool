@@ -1,0 +1,6 @@
+@ThreeCSchool.APIs_HostAddress = http://localhost:5179
+
+GET {{ThreeCSchool.APIs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
