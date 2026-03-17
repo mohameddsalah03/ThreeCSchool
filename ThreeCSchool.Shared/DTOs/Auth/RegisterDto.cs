@@ -11,6 +11,9 @@ namespace ThreeCSchool.Shared.DTOs.Auth
         [Required]
         [EmailAddress]
         public required string Email { get; set; }
+        [Required]
+        
+        public required string UserName { get; set; }
 
         public string? PhoneNumber { get; set; }
 
