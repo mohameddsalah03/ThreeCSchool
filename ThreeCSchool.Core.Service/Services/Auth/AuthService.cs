@@ -55,6 +55,7 @@ namespace ThreeCSchool.Core.Service.Services.Auth
                 Id = user.Id,
                 DisplayName = user.DisplayName,
                 Email = user.Email!,
+                UserName = user.UserName!,
                 Token = accessToken,
                 RefreshToken = refreshToken,
                 TokenExpiry = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
@@ -87,6 +88,7 @@ namespace ThreeCSchool.Core.Service.Services.Auth
                 Id = user.Id,
                 DisplayName = user.DisplayName,
                 Email = user.Email!,
+                UserName = user.UserName!,
                 Token = accessToken,
                 RefreshToken = refreshToken,
                 TokenExpiry = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
@@ -101,13 +103,13 @@ namespace ThreeCSchool.Core.Service.Services.Auth
                 throw new BadRequestException($"Invalid role. Allowed roles: {string.Join(", ", AllowedRoles)}");
 
             // 2. Build ApplicationUser
-            var userName = GenerateUserName(registerDto.Email);
+
 
             var user = new ApplicationUser
             {
                 DisplayName = registerDto.DisplayName,
                 Email = registerDto.Email,
-                UserName = userName,
+                UserName = registerDto.UserName,
                 PhoneNumber = registerDto.PhoneNumber,
                 TimeZone = registerDto.TimeZone,
                 IsActive = true,
@@ -119,7 +121,7 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             var result = await _userManager.CreateAsync(user, registerDto.Password);
 
             if (!result.Succeeded)
-                throw new ValidationException("Registration failed.",result.Errors.Select(e => e.Description));
+                throw new ValidationException("Registration failed.", result.Errors.Select(e => e.Description));
 
             // 4. Assign role → inserts into UserRoles table
             await _userManager.AddToRoleAsync(user, registerDto.Role);
@@ -138,6 +140,7 @@ namespace ThreeCSchool.Core.Service.Services.Auth
                 Id = user.Id,
                 DisplayName = user.DisplayName,
                 Email = user.Email!,
+                UserName = user.UserName,
                 Token = accessToken,
                 RefreshToken = refreshToken,
                 TokenExpiry = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
@@ -220,6 +223,7 @@ namespace ThreeCSchool.Core.Service.Services.Auth
                 Id = user.Id,
                 DisplayName = user.DisplayName,
                 Email = user.Email!,
+                UserName = user.UserName!,
                 Token = accessToken,
                 RefreshToken = newRefreshToken,
                 TokenExpiry = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
@@ -296,8 +300,8 @@ namespace ThreeCSchool.Core.Service.Services.Auth
         }
 
         #endregion
-        
-     
+
+
         public async Task ChangePasswordAsync(string userId, ChangePasswordDto dto)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -437,14 +441,9 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             }, out _);
         }
 
-        private static string GenerateUserName(string email)
-        {
-            var local = email.Split('@')[0];
-            var suffix = Guid.NewGuid().ToString("N")[..6];
-            return $"{local}_{suffix}".ToLower();
-        }
+       
 
-        
+
         // Generate & Send OTP
         private async Task SendOtpToUserAsync(ApplicationUser user)
         {
