@@ -107,14 +107,13 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             if (!AllowedRoles.Contains(registerDto.Role))
                 throw new BadRequestException( $"Invalid role. Allowed: {string.Join(", ", AllowedRoles)}");
 
-            // 2. بناء الـ User
-            var userName = GenerateUserName(registerDto.Email);
+           
 
             var user = new ApplicationUser
             {
                 DisplayName = registerDto.DisplayName,
                 Email = registerDto.Email,
-                UserName = userName,
+                UserName = registerDto.UserName,
                 PhoneNumber = registerDto.PhoneNumber,
                 TimeZone = registerDto.TimeZone,
                 IsActive = true,
@@ -459,12 +458,7 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             }, out _);
         }
 
-        private static string GenerateUserName(string email)
-        {
-            var local = email.Split('@')[0];
-            var suffix = Guid.NewGuid().ToString("N")[..6];
-            return $"{local}_{suffix}".ToLower();
-        }
+       
 
         // Generate & Send OTP
         private async Task SendOtpToUserAsync(ApplicationUser user)
