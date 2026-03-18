@@ -16,6 +16,7 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
                 .HasColumnType("decimal(10,2)")
                 .IsRequired();
 
+            // Nullable — either Course or Plan
             builder.Property(ci => ci.CourseId).IsRequired(false);
             builder.Property(ci => ci.PricingPlanId).IsRequired(false);
 

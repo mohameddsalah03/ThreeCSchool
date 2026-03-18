@@ -11,11 +11,28 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
             builder.ToTable("Testimonials");
 
             builder.Property(t => t.Id).ValueGeneratedOnAdd();
-            builder.Property(t => t.PersonName).HasMaxLength(150).IsRequired();
-            builder.Property(t => t.PersonType).HasMaxLength(20).IsRequired();
-            builder.Property(t => t.YoutubeVideoId).HasMaxLength(50).IsRequired();
-            builder.Property(t => t.TitleEn).HasMaxLength(300).IsRequired(false);
-            builder.Property(t => t.TitleAr).HasMaxLength(300).IsRequired(false);
+
+            builder.Property(t => t.PersonName)
+                .HasMaxLength(150)
+                .IsRequired();
+
+            // "Student" or "Parent"
+            builder.Property(t => t.PersonType)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            builder.Property(t => t.YoutubeVideoId)
+                .HasMaxLength(50)
+                .IsRequired();
+
+            builder.Property(t => t.TitleEn)
+                .HasMaxLength(300)
+                .IsRequired(false);
+
+            builder.Property(t => t.TitleAr)
+                .HasMaxLength(300)
+                .IsRequired(false);
+
             builder.Property(t => t.IsActive).HasDefaultValue(true);
             builder.Property(t => t.DisplayOrder).HasDefaultValue(0);
         }

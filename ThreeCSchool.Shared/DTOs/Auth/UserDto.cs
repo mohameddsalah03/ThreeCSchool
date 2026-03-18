@@ -10,5 +10,6 @@
         public required string RefreshToken { get; set; }
         public DateTime TokenExpiry { get; set; }
         public IEnumerable<string> Roles { get; set; } = new List<string>();
+
     }
 }

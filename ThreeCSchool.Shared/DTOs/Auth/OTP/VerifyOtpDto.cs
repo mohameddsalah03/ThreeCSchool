@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ThreeCSchool.Shared.DTOs.Auth.OTP
+namespace ThreeCSchool.Shared.DTOs.Auth
 {
     public class VerifyOtpDto
     {
@@ -9,7 +9,8 @@ namespace ThreeCSchool.Shared.DTOs.Auth.OTP
         public required string Email { get; set; }
 
         [Required]
-        [StringLength(6, MinimumLength = 6, ErrorMessage = "OTP must be exactly 6 digits.")]
+        [StringLength(6, MinimumLength = 6,
+            ErrorMessage = "OTP must be exactly 6 digits.")]
         public required string OtpCode { get; set; }
     }
 }

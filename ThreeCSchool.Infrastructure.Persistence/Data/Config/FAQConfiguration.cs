@@ -11,10 +11,18 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
             builder.ToTable("FAQs");
 
             builder.Property(f => f.Id).ValueGeneratedOnAdd();
-            builder.Property(f => f.QuestionEn).HasMaxLength(500).IsRequired();
-            builder.Property(f => f.QuestionAr).HasMaxLength(500).IsRequired();
+
+            builder.Property(f => f.QuestionEn)
+                .HasMaxLength(500)
+                .IsRequired();
+
+            builder.Property(f => f.QuestionAr)
+                .HasMaxLength(500)
+                .IsRequired();
+
             builder.Property(f => f.AnswerEn).IsRequired();
             builder.Property(f => f.AnswerAr).IsRequired();
+
             builder.Property(f => f.DisplayOrder).HasDefaultValue(0);
             builder.Property(f => f.IsActive).HasDefaultValue(true);
         }
