@@ -16,7 +16,7 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         public bool IsActive { get; set; } = true;
         public int DisplayOrder { get; set; } = 0;
 
-        // Navigation Properties
+        // Navigation
         public ICollection<PlanFeature> Features { get; set; } = new List<PlanFeature>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }

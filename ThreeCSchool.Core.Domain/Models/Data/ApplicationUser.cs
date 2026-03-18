@@ -14,13 +14,19 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
 
-        // OTP Verification
+        // OTP
         public string? OtpCode { get; set; }
         public DateTime? OtpExpiry { get; set; }
 
-        // Navigation Properties
+        // Navigation
         public Cart? Cart { get; set; }
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Course> CoursesAsInstructor { get; set; } = new List<Course>();
+
+        //  أضفنا — الـ Instructor بيكون assigned لـ Sessions
+        public ICollection<CourseSession> SessionsAsInstructor { get; set; } = new List<CourseSession>();
+
+        //  أضفنا — الـ Student بيحجز Sessions
+        public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }
 }

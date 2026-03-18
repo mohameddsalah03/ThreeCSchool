@@ -12,12 +12,16 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
 
             builder.Property(c => c.Id).ValueGeneratedOnAdd();
 
-            builder.Property(c => c.UserId).HasMaxLength(450).IsRequired();
+            builder.Property(c => c.UserId)
+                .HasMaxLength(450)
+                .IsRequired();
 
             // One cart per user
             builder.HasIndex(c => c.UserId).IsUnique();
 
-            // Cart → CartItems
+            builder.Property(c => c.UpdatedAt).IsRequired(false);
+
+            // Cart → CartItems (cascade)
             builder.HasMany(c => c.Items)
                 .WithOne(ci => ci.Cart)
                 .HasForeignKey(ci => ci.CartId)

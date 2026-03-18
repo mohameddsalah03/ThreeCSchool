@@ -11,13 +11,34 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
 {
     public class AccountController(IAuthService _authService) : BaseApiController
     {
-         
+       
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register([FromBody] RegisterDto dto)
+        public async Task<ActionResult<RegisterResponseDto>> Register([FromBody] RegisterDto dto)
         {
             var result = await _authService.RegisterAsync(dto);
             return Ok(result);
+        }
+
+      
+        [AllowAnonymous]
+        [HttpPost("verify-otp")]
+        public async Task<ActionResult<UserDto>> VerifyOtp([FromBody] VerifyOtpDto dto)
+        {
+            var result = await _authService.VerifyOtpAsync(dto);
+            return Ok(result);
+        }
+
+      
+        [AllowAnonymous]
+        [HttpPost("resend-otp")]
+        public async Task<ActionResult> ResendOtp( [FromBody] ResendOtpDto dto)
+        {
+            await _authService.ResendOtpAsync(dto);
+            return Ok(new
+            {
+                message = "A new OTP has been sent to your email."
+            });
         }
 
         [AllowAnonymous]
@@ -28,6 +49,7 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
             return Ok(result);
         }
 
+        
         [AllowAnonymous]
         [HttpPost("login/phone")]
         public async Task<ActionResult<UserDto>> LoginByPhone([FromBody] LoginByPhoneDto dto)
@@ -45,7 +67,6 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
             return Ok(result);
         }
 
-       
         [AllowAnonymous]
         [HttpPost("forgot-password")]
         public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
@@ -63,7 +84,7 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
         public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
         {
             await _authService.ResetPasswordAsync(dto);
-            return Ok(new { message = "Password has been reset successfully." });
+            return Ok(new { message = "Password reset successfully." });
         }
 
         
@@ -73,24 +94,6 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
         {
             var result = await _authService.RefreshTokenAsync(dto);
             return Ok(result);
-        }
-
-    
-        [AllowAnonymous]
-        [HttpPost("verify-otp")]
-        public async Task<ActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
-        {
-            await _authService.VerifyOtpAsync(dto);
-            return Ok(new { message = "Email verified successfully. You can now log in." });
-        }
-
-        
-        [AllowAnonymous]
-        [HttpPost("resend-otp")]
-        public async Task<ActionResult> ResendOtp([FromBody] ResendOtpDto dto)
-        {
-            await _authService.ResendOtpAsync(dto);
-            return Ok(new { message = "A new OTP has been sent to your email." });
         }
 
        
@@ -106,7 +109,7 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
             return Ok(result);
         }
 
-        
+       
         [Authorize]
         [HttpPut("profile")]
         public async Task<ActionResult<ProfileDto>> UpdateProfile([FromBody] UpdateProfileDto dto)
@@ -131,10 +134,11 @@ namespace ThreeCSchool.APIs.Controllers.Controllers.Account
             await _authService.ChangePasswordAsync(userId, dto);
             return Ok(new
             {
-                message = "Password changed successfully. Please log in again on all devices."
+                message = "Password changed. Please log in again on all devices."
             });
         }
 
+        
         [Authorize]
         [HttpPost("logout")]
         public async Task<ActionResult> Logout()

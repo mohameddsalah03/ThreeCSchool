@@ -14,9 +14,11 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         // Self-referencing FK
         public int? ParentCategoryId { get; set; }
 
-        // Navigation Properties
+        // Navigation
         public Category? ParentCategory { get; set; }
         public ICollection<Category> SubCategories { get; set; } = new List<Category>();
+
+        //  أضفنا Courses — الـ Category بتحتوي على Courses
         public ICollection<Course> Courses { get; set; } = new List<Course>();
     }
 }

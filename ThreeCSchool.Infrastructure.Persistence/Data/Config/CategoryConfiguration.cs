@@ -32,17 +32,16 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
 
             builder.Property(c => c.DisplayOrder).HasDefaultValue(0);
             builder.Property(c => c.IsActive).HasDefaultValue(true);
-
             builder.Property(c => c.ParentCategoryId).IsRequired(false);
 
-            // Self-referencing relationship
+            // Self-referencing
             builder.HasOne(c => c.ParentCategory)
                 .WithMany(c => c.SubCategories)
                 .HasForeignKey(c => c.ParentCategoryId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .IsRequired(false);
 
-            // Category → Courses
+            // ✅ Category → Courses (restrict — مينفعش تحذف category فيها courses)
             builder.HasMany(c => c.Courses)
                 .WithOne(co => co.Category)
                 .HasForeignKey(co => co.CategoryId)

@@ -12,10 +12,18 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
 
             builder.Property(c => c.Id).ValueGeneratedOnAdd();
 
-            builder.Property(c => c.TitleEn).HasMaxLength(300).IsRequired();
-            builder.Property(c => c.TitleAr).HasMaxLength(300).IsRequired();
+            builder.Property(c => c.TitleEn)
+                .HasMaxLength(300)
+                .IsRequired();
 
-            builder.Property(c => c.Slug).HasMaxLength(400).IsRequired();
+            builder.Property(c => c.TitleAr)
+                .HasMaxLength(300)
+                .IsRequired();
+
+            builder.Property(c => c.Slug)
+                .HasMaxLength(400)
+                .IsRequired();
+
             builder.HasIndex(c => c.Slug).IsUnique();
 
             builder.Property(c => c.DescriptionEn).IsRequired(false);
@@ -53,19 +61,25 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
             builder.HasIndex(c => c.CategoryId);
             builder.HasIndex(c => c.InstructorId);
 
-            // Course → Lessons
+            // Course → Lessons (cascade)
             builder.HasMany(c => c.Lessons)
                 .WithOne(l => l.Course)
                 .HasForeignKey(l => l.CourseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Course → Reviews
+            // Course → Sessions (cascade)
+            builder.HasMany(c => c.Sessions)
+                .WithOne(s => s.Course)
+                .HasForeignKey(s => s.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Course → Reviews (cascade)
             builder.HasMany(c => c.Reviews)
                 .WithOne(r => r.Course)
                 .HasForeignKey(r => r.CourseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Course → CartItems
+            // Course → CartItems (restrict — لو الكورس اتحذف مش هنحذف الـ cart)
             builder.HasMany(c => c.CartItems)
                 .WithOne(ci => ci.Course)
                 .HasForeignKey(ci => ci.CourseId)
