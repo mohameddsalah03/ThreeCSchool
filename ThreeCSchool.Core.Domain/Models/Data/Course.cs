@@ -32,6 +32,7 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         public Category Category { get; set; } = null!;
         public ApplicationUser Instructor { get; set; } = null!;
         public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+        public ICollection<CourseSession> Sessions { get; set; } = new List<CourseSession>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }

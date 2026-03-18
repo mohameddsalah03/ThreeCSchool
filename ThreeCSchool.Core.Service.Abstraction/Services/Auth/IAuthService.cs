@@ -6,22 +6,32 @@ namespace ThreeCSchool.Core.Service.Abstraction.Services.Auth
 {
     public interface IAuthService
     {
-        Task<UserDto> LoginAsync(LoginDto loginDto);
-        Task<UserDto> LoginByPhoneAsync(LoginByPhoneDto loginByPhoneDto);
-        Task<UserDto> RegisterAsync(RegisterDto registerDto);
-        Task<bool> EmailExists(string email);
-        Task ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);
-        Task ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
-        Task<UserDto> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
-
-
-        // ── New ───────────────────────────────────────────────
-        Task<ProfileDto> GetProfileAsync(string userId);
-        Task<ProfileDto> UpdateProfileAsync(string userId, UpdateProfileDto dto);
-        Task ChangePasswordAsync(string userId, ChangePasswordDto dto);
-        Task LogoutAsync(string userId);
-        Task VerifyOtpAsync(VerifyOtpDto dto);
+        // OTP
+        Task<UserDto> VerifyOtpAsync(VerifyOtpDto dto);
         Task ResendOtpAsync(ResendOtpDto dto);
 
+        // 
+        Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto);
+
+        Task<UserDto> LoginAsync(LoginDto loginDto);
+
+        Task<UserDto> LoginByPhoneAsync(LoginByPhoneDto dto);
+
+        Task<bool> EmailExists(string email);
+
+        Task ForgotPasswordAsync(ForgotPasswordDto dto);
+
+        Task ResetPasswordAsync(ResetPasswordDto dto);
+
+        Task<UserDto> RefreshTokenAsync(RefreshTokenDto dto);
+
+        Task ChangePasswordAsync(string userId, ChangePasswordDto dto);
+        
+        Task LogoutAsync(string userId);
+
+        // Profile
+        Task<ProfileDto> GetProfileAsync(string userId);
+
+        Task<ProfileDto> UpdateProfileAsync(string userId, UpdateProfileDto dto);
     }
 }

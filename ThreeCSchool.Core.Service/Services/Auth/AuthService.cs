@@ -39,8 +39,10 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             if (!user.IsActive)
                 throw new UnauthorizedException("Your account has been deactivated.");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(
-                user, loginDto.Password, lockoutOnFailure: true);
+            if (!user.EmailConfirmed)
+                throw new UnauthorizedException("Please verify your email first. Check your inbox for the OTP.");
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: true);
 
             if (result.IsLockedOut)
                 throw new UnauthorizedException("Account is locked. Try again in 5 minutes.");
@@ -72,7 +74,10 @@ namespace ThreeCSchool.Core.Service.Services.Auth
 
             if (!user.IsActive)
                 throw new UnauthorizedException("Your account has been deactivated.");
-
+            
+            if (!user.EmailConfirmed)
+                throw new UnauthorizedException( "Please verify your email first. Check your inbox for the OTP.");
+            
             var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: true);
 
             if (result.IsLockedOut)
@@ -96,55 +101,46 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             };
         }
 
-        public async Task<UserDto> RegisterAsync(RegisterDto registerDto)
+        public async Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto)
         {
-            // 1. Validate role — Admin can never self-register
+            // 1. Validate role
             if (!AllowedRoles.Contains(registerDto.Role))
-                throw new BadRequestException($"Invalid role. Allowed roles: {string.Join(", ", AllowedRoles)}");
+                throw new BadRequestException( $"Invalid role. Allowed: {string.Join(", ", AllowedRoles)}");
 
-            // 2. Build ApplicationUser
-
+            // 2. بناء الـ User
+            var userName = GenerateUserName(registerDto.Email);
 
             var user = new ApplicationUser
             {
                 DisplayName = registerDto.DisplayName,
                 Email = registerDto.Email,
-                UserName = registerDto.UserName,
+                UserName = userName,
                 PhoneNumber = registerDto.PhoneNumber,
                 TimeZone = registerDto.TimeZone,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                EmailConfirmed = false  // stays false until OTP verified
+                EmailConfirmed = false  // مش متحقق لحد ما يعمل OTP
             };
 
-            // 3. Create user — Identity hashes the password (PBKDF2)
+            // 3. حفظ في DB مع hash الـ password
             var result = await _userManager.CreateAsync(user, registerDto.Password);
-
             if (!result.Succeeded)
-                throw new ValidationException("Registration failed.", result.Errors.Select(e => e.Description));
+                throw new ValidationException(
+                    "Registration failed.",
+                    result.Errors.Select(e => e.Description));
 
-            // 4. Assign role → inserts into UserRoles table
+            // 4. تعيين الـ Role
             await _userManager.AddToRoleAsync(user, registerDto.Role);
 
-            // 5. Generate OTP and send verification email
-            //    EmailConfirmed stays false until VerifyOtp is called
+            // 5. إرسال OTP — مفيش Token هنا خالص
             await SendOtpToUserAsync(user);
 
-            // 6. Generate JWT + RefreshToken
-            var (accessToken, refreshToken) = await GenerateTokensAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-
-            // 7. Return UserDto — frontend routes user to OTP screen
-            return new UserDto
+            // 6. رجوع رسالة بس — مفيش JWT
+            return new RegisterResponseDto
             {
-                Id = user.Id,
-                DisplayName = user.DisplayName,
                 Email = user.Email!,
-                UserName = user.UserName,
-                Token = accessToken,
-                RefreshToken = refreshToken,
-                TokenExpiry = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
-                Roles = roles
+                Message = "Registration successful. Please check your email for the OTP.",
+                RequiresOtpVerification = true
             };
         }
         public async Task<bool> EmailExists(string email)
@@ -343,32 +339,54 @@ namespace ThreeCSchool.Core.Service.Services.Auth
         }
 
         #region OTP
-        public async Task VerifyOtpAsync(VerifyOtpDto dto)
+        public async Task<UserDto> VerifyOtpAsync(VerifyOtpDto dto)
         {
+            // 1. Find user
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user is null)
                 throw new BadRequestException("Invalid request.");
 
+            // 2. Already verified?
             if (user.EmailConfirmed)
                 throw new BadRequestException("Email is already verified.");
 
+            // 3. OTP موجود؟
             if (string.IsNullOrWhiteSpace(user.OtpCode))
-                throw new BadRequestException("No OTP was requested. Please request a new OTP.");
+                throw new BadRequestException(
+                    "No OTP found. Please request a new one.");
 
+            // 4. OTP منتهيش؟
             if (user.OtpExpiry is null || user.OtpExpiry < DateTime.UtcNow)
-                throw new BadRequestException("OTP has expired. Please request a new one.");
+                throw new BadRequestException(
+                    "OTP has expired. Please request a new one.");
 
+            // 5. OTP صح؟
             if (user.OtpCode != dto.OtpCode)
                 throw new BadRequestException("Invalid OTP code.");
 
-            // Mark email as verified
+            // 6. Confirm Email + Clear OTP
             user.EmailConfirmed = true;
             user.OtpCode = null;
             user.OtpExpiry = null;
-
             await _userManager.UpdateAsync(user);
-        }
 
+            // 7. دلوقتي بس بنولد الـ Token
+            var (accessToken, refreshToken) = await GenerateTokensAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new UserDto
+            {
+                Id = user.Id,
+                DisplayName = user.DisplayName,
+                Email = user.Email!,
+                UserName = user.UserName!,
+                Token = accessToken,
+                RefreshToken = refreshToken,
+                TokenExpiry = DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
+                Roles = roles
+            };
+
+        }
         public async Task ResendOtpAsync(ResendOtpDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -441,8 +459,12 @@ namespace ThreeCSchool.Core.Service.Services.Auth
             }, out _);
         }
 
-       
-
+        private static string GenerateUserName(string email)
+        {
+            var local = email.Split('@')[0];
+            var suffix = Guid.NewGuid().ToString("N")[..6];
+            return $"{local}_{suffix}".ToLower();
+        }
 
         // Generate & Send OTP
         private async Task SendOtpToUserAsync(ApplicationUser user)

@@ -12,15 +12,27 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
 
             builder.Property(r => r.Id).ValueGeneratedOnAdd();
 
-            builder.Property(r => r.UserId).HasMaxLength(450).IsRequired();
             builder.Property(r => r.Rating).IsRequired();
+
             builder.Property(r => r.Comment).IsRequired(false);
+
             builder.Property(r => r.IsApproved).HasDefaultValue(false);
 
-            // Unique constraint: one review per user per course
-            builder.HasIndex(r => new { r.UserId, r.CourseId }).IsUnique();
+            builder.Property(r => r.UserId)
+                .HasMaxLength(450)
+                .IsRequired();
+
+            // Unique — student واحد يكتب review واحد لكورس واحد
+            builder.HasIndex(r => new { r.UserId, r.CourseId })
+                .IsUnique();
 
             builder.HasIndex(r => r.CourseId);
+
+            // Review → User (restrict)
+            builder.HasOne(r => r.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

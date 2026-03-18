@@ -11,8 +11,15 @@ namespace ThreeCSchool.Infrastructure.Persistence.Data.Config
             builder.ToTable("PlanFeatures");
 
             builder.Property(f => f.Id).ValueGeneratedOnAdd();
-            builder.Property(f => f.DescriptionEn).HasMaxLength(200).IsRequired();
-            builder.Property(f => f.DescriptionAr).HasMaxLength(200).IsRequired();
+
+            builder.Property(f => f.DescriptionEn)
+                .HasMaxLength(200)
+                .IsRequired();
+
+            builder.Property(f => f.DescriptionAr)
+                .HasMaxLength(200)
+                .IsRequired();
+
             builder.Property(f => f.IsIncluded).HasDefaultValue(true);
             builder.Property(f => f.DisplayOrder).HasDefaultValue(0);
 
