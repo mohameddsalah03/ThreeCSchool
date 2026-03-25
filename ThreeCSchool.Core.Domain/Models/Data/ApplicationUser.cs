@@ -30,3 +30,4 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     }
 }
+

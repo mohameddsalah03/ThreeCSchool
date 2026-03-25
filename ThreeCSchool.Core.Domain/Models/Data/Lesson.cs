@@ -11,6 +11,8 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         public int? DurationInMinutes { get; set; }
         public int DisplayOrder { get; set; } = 0;
         public bool IsFreePreview { get; set; } = false;
+        public bool IsDeleted { get; set; } = false;
+        public DateTime UpdatedAt { get; set; } = DateTime.MinValue;
 
         // FK
         public int CourseId { get; set; }

@@ -3,10 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using ThreeCSchool.Core.Service.Abstraction.Services;
 using ThreeCSchool.Core.Service.Abstraction.Services.Auth;
 using ThreeCSchool.Core.Service.Abstraction.Services.Auth.Email;
+using ThreeCSchool.Core.Service.Abstraction.Services.Courses;
 using ThreeCSchool.Core.Service.Mapping;
 using ThreeCSchool.Core.Service.Services;
 using ThreeCSchool.Core.Service.Services.Auth;
 using ThreeCSchool.Core.Service.Services.Auth.Email;
+using ThreeCSchool.Core.Service.Services.Courses;
 using ThreeCSchool.Shared.Settings;
 
 namespace ThreeCSchool.Core.Service
@@ -27,9 +29,10 @@ namespace ThreeCSchool.Core.Service
             services.AddScoped<IServiceManager, ServiceManager>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ICourseService, CourseService>();
 
 
-           
+
 
             return services;
         }

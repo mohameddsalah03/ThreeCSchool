@@ -19,6 +19,7 @@ namespace ThreeCSchool.Core.Domain.Models.Data
         public bool IsDownloadable { get; set; } = false;
         public bool IsUpcoming { get; set; } = false;
         public bool IsPublished { get; set; } = false;
+        public bool IsDeleted { get; set; } = false;
         public decimal AverageRating { get; set; } = 0;
         public int TotalEnrollments { get; set; } = 0;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

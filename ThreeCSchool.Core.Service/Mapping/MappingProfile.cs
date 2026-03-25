@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ThreeCSchool.Core.Domain.Models.Data;
 using ThreeCSchool.Shared.DTOs.Categories;
+using ThreeCSchool.Shared.DTOs.Courses;
+using ThreeCSchool.Shared.DTOs.Lessons;
 
 namespace ThreeCSchool.Core.Service.Mapping
 {
@@ -24,6 +26,13 @@ namespace ThreeCSchool.Core.Service.Mapping
                 .ForMember(dest => dest.Courses,opt => opt.Ignore())
                 .ForMember(dest => dest.ParentCategory,opt => opt.Ignore());
 
+            // Course , CourseDto
+            CreateMap<Course, CourseDto>()
+                .ForMember(dest=> dest.CategoryName, opt=> opt.MapFrom(src=>src.Category.NameAr))
+                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor.DisplayName));
+
+            // Lesson , LessonDto
+            CreateMap<Lesson, LessonDto>();
 
         }
     }
